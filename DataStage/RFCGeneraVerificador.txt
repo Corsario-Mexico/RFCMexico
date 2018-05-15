@@ -1,0 +1,49 @@
+* Claves y valores del dígito verificados
+Clave =
+"0":@FM:"1":@FM:"2":@FM:"3":@FM:"4":@FM:"5":@FM:"6":@FM:"7":@FM:"8":@FM:"9":@FM:
+"A" :@FM:"B" :@FM:"C" :@FM:"D" :@FM:"E" :@FM:"F" :@FM:"G" :@FM:"H" :@FM:"I"
+:@FM:"J" :@FM:"K" :@FM:"L" :@FM:"M" :@FM:"N" :@FM:"&" :@FM:"O" :@FM:"P"
+:@FM:"Q" :@FM:"R" :@FM:"S" :@FM:"T" :@FM:"U" :@FM:"V" :@FM:"W" :@FM:"X"
+:@FM:"Y" :@FM:"Z" :@FM:" " :@FM:"Ñ"
+Valor =
+"0":@FM:"1":@FM:"2":@FM:"3":@FM:"4":@FM:"5":@FM:"6":@FM:"7":@FM:"8":@FM:"9":@FM:
+"10":@FM:"11":@FM:"12":@FM:"13":@FM:"14":@FM:"15":@FM:"16":@FM:"17":@FM:"18":@FM
+:"19":@FM:"20":@FM:"21":@FM:"22":@FM:"23":@FM:"24":@FM:"25":@FM:"26":@FM:"27":@F
+M:"28":@FM:"29":@FM:"30":@FM:"31":@FM:"32":@FM:"33":@FM:"34":@FM:"35":@FM:"36":@
+FM:"37":@FM:"38"
+
+* Limpia el RFC
+RFC = UpCase(Left(Trim(RFCSinVerificador),12))
+
+* Si solo tiene 11 posiciones se entiende que es de persona moral, y se agrega
+un " " al inicio
+IF Len(RFC) = 11 THEN
+    RFC = " ":RFC
+END
+
+* Inicializa la suma
+Suma = 0
+
+* Obtiene la suma
+FOR Pos = 1 TO 12
+    FIND RFC[Pos,1] IN Clave SETTING Elemento THEN
+        Suma = Suma + (Valor<Elemento> * (14-Pos))
+    END
+NEXT Pos
+
+* Obtiene el modulo
+Modulo = Mod(Suma,11)
+
+* Obtiene la letra
+Verificador = 11 - Modulo
+
+IF Verificador = 10 THEN
+    Verificador = "A"
+END
+
+IF Verificador = 11 THEN
+    Verificador = "0"
+END
+
+* Retorna el valor
+Ans = Verificador

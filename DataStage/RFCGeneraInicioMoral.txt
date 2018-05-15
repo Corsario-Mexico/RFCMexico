@@ -1,0 +1,97 @@
+* Arreglo din·mico de palabras por ignorar
+Ignorar = " A EN P ":@FM:" S DE RL ":@FM:" S EN C POR A ":@FM:" S EN C ":@FM:"
+S EN NC ":@FM:" SA DE CV MI ":@FM:" SA DE CV ":@FM:" SA MI ":@FM:" SRL CV MI
+":@FM:" SRL CV ":@FM:" SRL MI ":@FM:" A ":@FM:" AC ":@FM:" AL ":@FM:" AND
+":@FM:" CIA ":@FM:" CO ":@FM:" COMPANY ":@FM:" COMPA—IA ":@FM:" CON ":@FM:"
+COOP ":@FM:" COOPERATIVA ":@FM:" DE ":@FM:" DEL ":@FM:" E ":@FM:" EL ":@FM:" EN
+":@FM:" LA ":@FM:" LAS ":@FM:" LOS ":@FM:" MAC ":@FM:" MC ":@FM:" MI ":@FM:" OF
+":@FM:" PARA ":@FM:" POR ":@FM:" SA ":@FM:" SC ":@FM:" SCL ":@FM:" SCS ":@FM:"
+SNC ":@FM:" SOC ":@FM:" SOCIEDAD ":@FM:" SUS ":@FM:" THE ":@FM:" VAN ":@FM:"
+VON ":@FM:" Y "
+
+* Limpia la razÛn social
+Nombre = Convert("¡…Õ”⁄¿»Ã“Ÿ¬ Œ‘€ƒÀœ÷‹«","AEIOUAEIOUAEIOUAEIOUC","
+":UpCase(Trim(RazonSocial)):" ")
+Nombre = Change(Nombre," CH"," C")
+Nombre = Change(Nombre," LL"," L")
+Nombre = Change(Nombre," @ "," ARROBA ")
+Nombre = Change(Nombre," ¥ "," APOSTROFE ")
+Nombre = Change(Nombre," % "," PORCIENTO ")
+Nombre = Change(Nombre," # "," NUMERO ")
+Nombre = Change(Nombre," ! "," ADMIRACION ")
+Nombre = Change(Nombre," . "," PUNTO ")
+Nombre = Change(Nombre," $ "," PESOS ")
+Nombre = Change(Nombre,\ " \," COMILLAS ")
+Nombre = Change(Nombre," - "," GUION ")
+Nombre = Change(Nombre," / "," DIAGONAL ")
+Nombre = Change(Nombre," + "," SUMA ")
+Nombre = Change(Nombre," ( "," ABRE PARENTESIS ")
+Nombre = Change(Nombre," ) "," CIERRA PARENTESIS ")
+
+Limpio = ""
+
+FOR Pos = 1 to Len(Nombre)
+    IF (ALPHA(Nombre[Pos,1]) = 1) OR (Nombre[Pos,1] = "—") OR (Nombre[Pos,1] =
+" ") THEN
+        Limpio = Limpio : Nombre[Pos,1]
+    END
+NEXT Pos
+
+FOR Pos = 1 to DCount(Ignorar,@FM)
+    Limpio = Change (Limpio,Ignorar<Pos>," ")
+NEXT Pos
+
+Limpio = Trim(Limpio)
+
+* Si faltan par·metros aborta
+IF Limpio = "" Then
+    RETURN("")
+END
+
+* Valida fecha de nacimiento
+Fecha = IConv (Constitucion[3,2]:"-":Constitucion[5,2]:"-
+":Constitucion[1,2],"D-MDY")
+IF STATUS() <> "0" THEN
+    RETURN("")
+END
+
+* Inicializa contador de palabra
+NumPalabra = 0
+
+* Inicializa resultado
+RFC = ""
+
+* Separa las palabras y las procesa
+LOOP
+    * Incrementa Palabra
+    NumPalabra = NumPalabra + 1
+
+    * Busca un espacio
+    Pos = Index(Limpio," ",1)
+
+    * Separa la siguiente palabra
+    IF Pos = 0 THEN
+        Palabra = Trim(Limpio)
+        Limpio = ""
+        END
+    ELSE
+        Palabra = Trim(Left(Limpio,Pos))
+        Limpio = Trim(Limpio[Pos,200])
+    END
+
+    * Toma la(s) letra(s) necesarias
+    RFC = RFC[1,NumPalabra-1] : Left(Palabra, 4-NumPalabra)
+
+UNTIL (Limpio = "") OR (NumPalabra = 3) REPEAT
+
+* Si no encontrÛ nada reporta error
+IF Len(RFC) = 0 THEN
+    RETURN("")
+END
+
+* Si no completo la cadena agrega "X"'s
+IF Len(RFC) < 3 THEN
+    RFC = Left(RFC : "XX", 3)
+END
+
+Ans = RFC : Constitucion[1,6]

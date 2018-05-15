@@ -1,0 +1,39 @@
+* Define funciones
+DEFFUN RFCGeneraInicioMoral (RS1, Con1) Calling "DSU.RFCGeneraInicioMoral"
+DEFFUN RFCGeneraHomoclave (Completo) Calling "DSU.RFCGeneraHomoclave"
+DEFFUN RFCGeneraVerificador (RFC) Calling "DSU.RFCGeneraVerificador"
+
+* Limpia la razón social
+RS1 = UpCase(Trim(RazonSocial))
+
+* Limpia la fecha de nacimiento
+Con1 = Left(Constitucion,6)
+
+* Si faltan parámetros aborta
+IF RS1 = "" Then
+    RETURN("")
+END
+
+* Valida fecha de nacimiento
+Fecha = IConv (Con1[3,2]:"-":Con1[5,2]:"-":Con1[1,2],"D-MDY")
+
+IF STATUS() <> "0" THEN
+    RETURN ("")
+END
+
+* Genera el inicio del RFC
+RFC = RFCGeneraInicioMoral(RS1, Con1)
+
+* Aborta si error
+IF RFC = "" THEN
+    RETURN ("")
+END
+
+* Agrega la homoclave
+RFC = RFC : RFCGeneraHomoclave(RS1)
+
+* Agrega el verificador
+RFC = RFC : RFCGeneraVerificador(RFC)
+
+* Retorna el resultado
+Ans = RFC

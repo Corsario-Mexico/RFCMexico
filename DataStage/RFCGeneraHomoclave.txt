@@ -1,0 +1,79 @@
+* Claves y valores para cada letra del nombre completo
+ClaveH1 = " " :@FM:"0" :@FM:"1" :@FM:"2" :@FM:"3" :@FM:"4" :@FM:"5" :@FM:"6"
+:@FM:"7" :@FM:"8" :@FM:"9" :@FM:"&" :@FM:"A" :@FM:"B" :@FM:"C" :@FM:"D"
+:@FM:"E" :@FM:"F" :@FM:"G" :@FM:"H" :@FM:"I" :@FM:"J" :@FM:"K" :@FM:"L"
+:@FM:"M" :@FM:"N" :@FM:"O" :@FM:"P" :@FM:"Q" :@FM:"R" :@FM:"S" :@FM:"T"
+:@FM:"U" :@FM:"V" :@FM:"W" :@FM:"X" :@FM:"Y" :@FM:"Z" :@FM:"—"
+ValorH1 =
+"00":@FM:"00":@FM:"01":@FM:"02":@FM:"03":@FM:"04":@FM:"05":@FM:"06":@FM:"07":@FM
+:"08":@FM:"09":@FM:"10":@FM:"11":@FM:"12":@FM:"13":@FM:"14":@FM:"15":@FM:"16":@F
+M:"17":@FM:"18":@FM:"19":@FM:"21":@FM:"22":@FM:"23":@FM:"24":@FM:"25":@FM:"26":@
+FM:"27":@FM:"28":@FM:"29":@FM:"32":@FM:"33":@FM:"34":@FM:"35":@FM:"36":@FM:"37":
+@FM:"38":@FM:"39":@FM:"40"
+
+* Claves y valores para las letras de la clave homÛnima
+ClaveH2 =
+"0":@FM:"1":@FM:"2":@FM:"3":@FM:"4":@FM:"5":@FM:"6":@FM:"7":@FM:"8":@FM:"9":@FM:
+"10":@FM:"11":@FM:"12":@FM:"13":@FM:"14":@FM:"15":@FM:"16":@FM:"17":@FM:"18":@FM
+:"19":@FM:"20":@FM:"21":@FM:"22":@FM:"23":@FM:"24":@FM:"25":@FM:"26":@FM:"27":@F
+M:"28":@FM:"29":@FM:"30":@FM:"31":@FM:"32":@FM:"33"
+ValorH2 =
+"1":@FM:"2":@FM:"3":@FM:"4":@FM:"5":@FM:"6":@FM:"7":@FM:"8":@FM:"9":@FM:"A":@FM:
+"B" :@FM:"C" :@FM:"D" :@FM:"E" :@FM:"F" :@FM:"G" :@FM:"H" :@FM:"I" :@FM:"J"
+:@FM:"K" :@FM:"L" :@FM:"M" :@FM:"N" :@FM:"P" :@FM:"Q" :@FM:"R" :@FM:"S"
+:@FM:"T" :@FM:"U" :@FM:"V" :@FM:"W" :@FM:"X" :@FM:"Y" :@FM:"Z"
+
+* Limpia el nombre
+Nombre = " " :
+Convert("¡…Õ”⁄¿»Ã“Ÿ¬ Œ‘€ƒÀœ÷‹«—","AEIOUAEIOUAEIOUAEIOUC&",UpCase(Trim(NombreComp
+leto)))
+
+* Crea la cadena de valores numÈricos de cada letra
+Pos = 1
+Valores = ""
+LOOP
+    FIND Nombre[Pos,1] IN ClaveH1 SETTING Elemento THEN
+        * Toma la cadena correspondiente a la letra, si no la encuentra la
+ignora
+        Valores = Valores : ValorH1<Elemento>
+    END
+    Pos = Pos + 1
+UNTIL Pos > Len (Nombre) REPEAT
+
+* Inicializa la suma
+Suma = 0
+
+* Obtiene la suma de las cadenas de cada letra
+FOR Pos = 1 TO Len(Valores) - 1
+    Suma = Suma + (Valores[Pos,2] * Valores[Pos+1,1])
+NEXT Pos
+
+* Obtiene las ˙ltimas tres cifras
+Suma = Mod(Suma,1000)
+
+* Obtiene el resultado de la divisiÛn entera y del mÛdulo
+Resultado = Div(Suma, 34)
+Modulo = Mod(Suma,34)
+
+* Obtiene la letra que corresponde a la divisiÛn entera
+FIND Resultado IN ClaveH2 SETTING Elemento THEN
+    * Toma la letra que corresponde al valor
+    ClaveHomonima = ValorH2<Elemento>
+    END
+ELSE
+    * Si no la encuentra pone "1"
+    ClaveHomonima = "1"
+END
+
+* Obtiene la letra que corresponde al mÛdulo
+FIND Modulo IN ClaveH2 SETTING Elemento THEN
+    * Toma la letra que corresponde al valor
+    ClaveHomonima = ClaveHomonima : ValorH2<Elemento>
+    END
+ELSE
+    * Si no la encuentra pone "1"
+    ClaveHomonima = ClaveHomonima : "1"
+END
+
+* Retorna el resultado
+Ans = ClaveHomonima

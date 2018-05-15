@@ -1,0 +1,287 @@
+* Arreglo din·mico de vocales
+Vocales = "A":@FM:"E":@FM:"I":@FM:"O":@FM:"U"
+
+        fListIgnorarApellidos.add("de");
+
+
+* Arreglo din·mico de apellidos por ignorar
+IgnorarApellidos =
+        fListIgnorarApellidos.add("DE")
+        fListIgnorarApellidos.add("DEL");
+        fListIgnorarApellidos.add("LA");
+        fListIgnorarApellidos.add("LAS");
+        fListIgnorarApellidos.add("LOS");
+        fListIgnorarApellidos.add("MAC");
+        fListIgnorarApellidos.add("MC");
+        fListIgnorarApellidos.add("MI");
+        fListIgnorarApellidos.add("VAN");
+        fListIgnorarApellidos.add("VON");
+        fListIgnorarApellidos.add("Y");
+
+
+
+* Arreglo din·mico de nombres por ignorar
+IgnorarNombres = IgnorarApellidos:@FM:"JOSE":@FM:"MARIA"
+
+* Arreglo din·mico de RFC inv·lidos
+
+        fListPrefijosInvalidos.add("");
+
+Invalidos =
+        fListPrefijosInvalidos.add("BUEI");
+        fListPrefijosInvalidos.add("BUEY");
+        fListPrefijosInvalidos.add("CACA");
+        fListPrefijosInvalidos.add("CACO");
+        fListPrefijosInvalidos.add("CAGA");
+        fListPrefijosInvalidos.add("CAGO");
+        fListPrefijosInvalidos.add("CAKA");
+        fListPrefijosInvalidos.add("CAKO");
+        fListPrefijosInvalidos.add("COGE");
+        fListPrefijosInvalidos.add("COJA");
+        fListPrefijosInvalidos.add("COJE");
+        fListPrefijosInvalidos.add("COJI");
+        fListPrefijosInvalidos.add("COJO");
+        fListPrefijosInvalidos.add("CULO");
+        fListPrefijosInvalidos.add("FETO");
+        fListPrefijosInvalidos.add("GUEY");
+        fListPrefijosInvalidos.add("JOTO");
+        fListPrefijosInvalidos.add("KACA");
+        fListPrefijosInvalidos.add("KACO");
+        fListPrefijosInvalidos.add("KAGA");
+        fListPrefijosInvalidos.add("KAGO");
+        fListPrefijosInvalidos.add("KAKA");
+        fListPrefijosInvalidos.add("KOGE");
+        fListPrefijosInvalidos.add("KOJO");
+        fListPrefijosInvalidos.add("KULO");
+        fListPrefijosInvalidos.add("MAME");
+        fListPrefijosInvalidos.add("MAMO");
+        fListPrefijosInvalidos.add("MEAR");
+        fListPrefijosInvalidos.add("MEAS");
+        fListPrefijosInvalidos.add("MEON");
+        fListPrefijosInvalidos.add("MION");
+        fListPrefijosInvalidos.add("MOCO");
+        fListPrefijosInvalidos.add("MULA");
+        fListPrefijosInvalidos.add("PEDA");
+        fListPrefijosInvalidos.add("PEDO");
+        fListPrefijosInvalidos.add("PENE");
+        fListPrefijosInvalidos.add("PUTA");
+        fListPrefijosInvalidos.add("PUTO");
+        fListPrefijosInvalidos.add("QULO");
+        fListPrefijosInvalidos.add("RATA");
+        fListPrefijosInvalidos.add("RUIN");
+
+* Limpia el apellido paterno
+Pat =
+Convert("¡…Õ”⁄¿»Ã“Ÿ¬ Œ‘€ƒÀœ÷‹«","AEIOUAEIOUAEIOUAEIOUC",UpCase(Trim(Paterno)))
+IF Pat[1,2] = "CH" THEN
+    Pat = "C" : Pat[3,100]
+END
+IF Pat[1,2] = "LL" THEN
+    Pat = "L" : Pat[3,100]
+END
+
+* Limpia el apellido materno
+Mat =
+Convert("¡…Õ”⁄¿»Ã“Ÿ¬ Œ‘€ƒÀœ÷‹«","AEIOUAEIOUAEIOUAEIOUC",UpCase(Trim(Materno)))
+IF Mat[1,2] = "CH" THEN
+    Mat = "C" : Mat[3,100]
+END
+IF Mat[1,2] = "LL" THEN
+    Mat = "L" : Mat[3,100]
+END
+
+* Limpia el nombre
+Nom =
+Convert("¡…Õ”⁄¿»Ã“Ÿ¬ Œ‘€ƒÀœ÷‹«","AEIOUAEIOUAEIOUAEIOUC",UpCase(Trim(Nombre)))
+IF Nom[1,2] = "CH" THEN
+    Nom = "C" : Nom[3,100]
+END
+IF Nom[1,2] = "LL" THEN
+    Nom = "L" : Nom[3,100]
+END
+
+* Inicializa resultado
+RFC = ""
+
+* Si faltan par·metros aborta
+IF Pat = "" Then
+    RETURN("")
+END
+
+IF Nom = "" Then
+    RETURN("")
+END
+
+* Valida fecha de nacimiento
+Fecha = IConv (Nacimiento[3,2]:"-":Nacimiento[5,2]:"-":Nacimiento[1,2],"D-MDY")
+IF STATUS() <> "0" THEN
+    RETURN ("")
+END
+
+* Apellido Paterno
+* Separa las palabras y busca la primera v·lida
+LOOP
+    * Busca un espacio
+    Pos = Index(Pat," ",1)
+
+    * Separa la siguiente palabra
+    IF Pos = 0 THEN
+        Palabra = Trim(Pat)
+        Pat = ""
+        END
+    ELSE
+        Palabra = Trim(Left(Pat,Pos))
+        Pat = Trim(Pat[Pos,100])
+    END
+
+    * Ignora las conjunciones y preposiciones
+    FIND Palabra IN IgnorarApellidos SETTING Elemento THEN
+        CONTINUE
+    END
+
+    * Es la primera palabra v·lida del apellido
+    * Toma la primera letra
+    RFC = Left(Palabra,1)
+
+    IF Len(Palabra) > 2 THEN
+        * Busca primera vocal, si es de longitud suficiente
+        PaternoCorto = 0
+        Pos = 2
+        LOOP
+            FIND Palabra[Pos,1] IN Vocales SETTING Elemento THEN
+                RFC = RFC : Palabra[Pos,1]
+                EXIT
+            END
+            Pos = Pos + 1
+        UNTIL Pos = Len(Palabra) REPEAT
+
+        * Si no la encuentra pone una "X"
+        IF Len(RFC) = 1 THEN
+            RFC = RFC : "X"
+        END
+        END
+    ELSE
+        * Si no toma dos letras del nombre
+        PaternoCorto = 1
+    END
+
+    Exit
+
+UNTIL Pat = "" REPEAT
+
+* Si no encontrÛ una palabra v·lida aborta
+IF RFC = "" Then
+    RETURN("")
+End
+
+* Apellido Materno
+* Si no hay apellido materno debe usar las dos primeras letras del nombre
+IF Mat = "" THEN
+    NoMaterno = 1
+    END
+ELSE
+    NoMaterno = 0
+END
+
+* Separa las palabras y busca la primera v·lida
+LOOP
+    * Busca un espacio
+    Pos = Index(Mat," ",1)
+
+    * Separa la siguiente palabra
+    IF Pos = 0 THEN
+        Palabra = Trim(Mat)
+        Mat = ""
+        END
+    ELSE
+        Palabra = Trim(Left(Mat,Pos))
+        Mat = Trim(Mat[Pos,100])
+    END
+
+    * Ignora las conjunciones y preposiciones
+    FIND Palabra IN IgnorarApellidos SETTING Elemento THEN
+        CONTINUE
+    END
+
+    * Es la primera palabra v·lida del apellido
+    * Toma la primera letra
+    RFC = RFC : Left(Palabra,1)
+
+    Exit
+
+UNTIL Mat = "" REPEAT
+
+* Si no encuentra una palabra v·lida pone una "X"
+IF (PaternoCorto = 0) AND (NoMaterno = 0) AND (Len(RFC) = 2) THEN
+    RFC = RFC : "X"
+END
+
+* Nombre
+* Inicializa la inicial posible
+Posible = ""
+* Separa las palabras y busca la primera v·lida
+LOOP
+    * Busca un espacio
+    Pos = Index(Nom," ",1)
+
+    * Separa la siguiente palabra
+    IF Pos = 0 THEN
+        Palabra = Trim(Nom)
+        Nom = ""
+        END
+    ELSE
+        Palabra = Trim(Left(Nom,Pos))
+        Nom = Trim(Nom[Pos,100])
+    END
+
+    * Ignora las conjunciones y preposiciones
+    FIND Palabra IN IgnorarNombres SETTING Elemento THEN
+        * Almacena la(s) primera(s) letra(s) a usar si no hay otra
+        IF Posible = "" THEN
+            Posible = Left(Palabra,2)
+        END
+        CONTINUE
+    END
+
+    * Es la primera palabra v·lida del nombre
+    * Toma la(s) primera(s) letra(s)
+    IF LEN(RFC) = 3 THEN
+        * Si hay apellido materno y paterno de longitud suficiente toma una
+letra
+        RFC = RFC : Left(Palabra,1)
+        END
+    ELSE
+        * Si no hay apellido materno o paterno de longitud suficiente toma dos
+letras
+        RFC = RFC : Left(Palabra,2)
+    END
+
+    Exit
+
+UNTIL Nom = "" REPEAT
+
+* Si no encuentra una palabra v·lida...
+IF Len(RFC) < 4 THEN
+    * Si encontrÛ una posible la usa, si no aborta
+    IF Posible <> "" THEN
+        IF (NoMaterno = 0) THEN
+            * Si hay apellido materno toma una letra
+            RFC = RFC : Left(Posible,1)
+            END
+        ELSE
+            * Si no hay apellido materno toma dos letras
+            RFC = RFC : Left(Posible,2)
+        END
+        END
+    ELSE
+        Return ("")
+    END
+END
+
+* Si es un RFC inv·lido cambia la ˙ltima letra por X
+FIND RFC IN Invalidos SETTING Elemento THEN
+    RFC = Left(RFC,3) : "X"
+END
+
+* Retorna el resultado
+Ans = RFC : Nacimiento[1,6]

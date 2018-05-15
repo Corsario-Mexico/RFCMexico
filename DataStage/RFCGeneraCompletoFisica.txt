@@ -1,0 +1,50 @@
+* Define funciones
+DEFFUN RFCGeneraInicioFisica (Pat1, Mat1, Nom1, Nac1) Calling
+"DSU.RFCGeneraInicioFisica"
+DEFFUN RFCGeneraHomoclave (Completo) Calling "DSU.RFCGeneraHomoclave"
+DEFFUN RFCGeneraVerificador (RFC) Calling "DSU.RFCGeneraVerificador"
+
+* Limpia el apellido paterno
+Pat1 = UpCase(Trim(Paterno))
+
+* Limpia el apellido materno
+Mat1 = UpCase(Trim(Materno))
+
+* Limpia el nombre
+Nom1 = UpCase(Trim(Nombre))
+
+* Limpia la fecha de nacimiento
+Nac1 = Left(Nacimiento,6)
+
+* Si faltan parámetros aborta
+IF Pat1 = "" Then
+    RETURN("")
+END
+
+IF Nom1 = "" Then
+    RETURN("")
+END
+
+* Valida fecha de nacimiento
+Fecha = IConv (Nac1[3,2]:"-":Nac1[5,2]:"-":Nac1[1,2],"D-MDY")
+
+IF STATUS() <> "0" THEN
+    RETURN ("")
+END
+
+* Genera el inicio del RFC
+RFC = RFCGeneraInicioFisica(Pat1, Mat1, Nom1, Nac1)
+
+* Aborta si error
+IF RFC = "" THEN
+    RETURN ("")
+END
+
+* Agrega la homoclave
+RFC = RFC : RFCGeneraHomoclave(Pat1 : " " : Mat1 : " " : Nom1)
+
+* Agrega el verificador
+RFC = RFC : RFCGeneraVerificador(RFC)
+
+* Retorna el resultado
+Ans = RFC

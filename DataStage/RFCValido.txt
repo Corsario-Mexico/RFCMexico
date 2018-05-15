@@ -1,0 +1,35 @@
+* Declara funciones
+DEFFUN RFCGeneraVerificador(RFC) CALLING "DSU.RFCGeneraVerificador"
+
+* Limpia el RFC
+RFC13 = UpCase(Left(Trim(RFC),13))
+
+* Si son 12 posiciones supone es de persona moral, y coloca un "-" al inicio
+IF Len(RFC13) = 12 THEN
+    RFC13 = "-" : RFC13
+END
+
+* Si no son 13 posiciones retorna falso
+IF Len(RFC13) < 13 THEN
+    RETURN(0)
+END
+
+* Si la fecha no es válida retorna falso
+Fecha = IConv (RFC13[7,2]:"-":RFC13[9,2]:"-":RFC13[5,2],"D-MDY")
+IF STATUS() <> "0" THEN
+    RETURN (0)
+END
+
+* Obtiene el dígito verificador
+Verificador = RFCGeneraVerificador(Left(RFC13,12))
+
+* Compara el dígito verificador
+IF Verificador = RFC13[13,1] THEN
+    Valido = 1
+    END
+ELSE
+    Valido = 0
+END
+
+* Retorna el valor
+Ans = Valido
