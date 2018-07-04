@@ -1,0 +1,23 @@
+{
+  "name": "rfc_mexico",
+  "version": "1.0.0",
+  "description": "Librería para manejo del Registro Federal de Causantes (RFC) de México",
+  "main": "RFClib.js",
+  "scripts": {
+    "test": "RFClib_test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Corsario-Mexico/RFCMexico.git"
+  },
+  "keywords": [
+    "RFC",
+    "méxico"
+  ],
+  "author": "David Sol",
+  "license": "CC-BY-NC-SA-4.0",
+  "bugs": {
+    "url": "https://github.com/Corsario-Mexico/RFCMexico/issues"
+  },
+  "homepage": "https://github.com/Corsario-Mexico/RFCMexico#readme"
+}
